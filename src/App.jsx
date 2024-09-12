@@ -2,10 +2,19 @@ import "./App.css";
 import React, { useState, useEffect } from "react";
 import Editor from "./editor";
 function App() {
-  const [html, sethtml] = useState("");
-  const [css, setcss] = useState("");
-  const [js, setjs] = useState("");
-  const [source, setSource] = useState("");
+  const initialHtml = localStorage.getItem("html") || "";
+  const initialCss = localStorage.getItem("css") || "";
+  const initialJs = localStorage.getItem("js") || "";
+
+  const [html, sethtml] = useState(initialHtml);
+  const [css, setcss] = useState(initialCss);
+  const [js, setjs] = useState(initialJs);
+  const [source, setSource] = useState(`
+  <html>
+    <body>${initialHtml}</body>
+    <style>${initialCss}</style>
+    <script>${initialJs}</script>
+  </html>`);
   useEffect(() => {
     const timeout = setTimeout(() => {
       setSource(`
@@ -17,6 +26,15 @@ function App() {
     }, 250);
     return () => clearTimeout(timeout);
   }, [html, css, js]);
+  useEffect(() => {
+    localStorage.setItem("html", html);
+  }, [html]);
+  useEffect(() => {
+    localStorage.setItem("js", js);
+  }, [js]);
+  useEffect(() => {
+    localStorage.setItem("css", css);
+  }, [css]);
 
   return (
     <>
@@ -35,8 +53,8 @@ function App() {
           onChange={setjs}
         />
       </div>
+      <h2>Output:</h2>
       <div className="panel">
-        <h2>Output:</h2>
         <iframe
           srcDoc={source}
           title="output"
